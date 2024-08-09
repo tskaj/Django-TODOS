@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 # Create your views here.
-class UserViewSet(APIView):
+class UserView(APIView):
     users = User.objects.all()
     serializer_class = UserSerializer
     permission_classes =() #[permissions.IsAuthenticated]

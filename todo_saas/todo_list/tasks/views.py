@@ -20,7 +20,7 @@ def get_querset(self):
 def perform_create(self, serializer):
     serializer.save(user = self.request.user)
     
-class FileViewSet(APIView):
+class FileView(APIView):
     #queryset = User.objects.all()
     serializer_class = FileSerializer
     permission_classes =() # [permissions.IsAuthenticated]
