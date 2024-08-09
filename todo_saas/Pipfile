@@ -10,6 +10,9 @@ psycopg2-binary = "*"
 django-oauth-toolkit = "*"
 python-decouple = "*"
 decouple = "*"
+serializers = "*"
+python-dotenv = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
