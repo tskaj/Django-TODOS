@@ -4,7 +4,7 @@ from todo_list.models import TodoList
 
 # Task model
 class Task(models.Model):
-    Todo_list = models.ManyToManyField(TodoList)
+    todo_list = models.ForeignKey(TodoList, on_delete=models.CASCADE, related_name='task', null=True, blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     creation_date = models.DateTimeField(auto_now_add=True)

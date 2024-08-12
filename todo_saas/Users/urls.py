@@ -1,14 +1,8 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import UserView
-
-#router = DefaultRouter()
-#router.register(r'users', UserViewSet, basename= 'users')
-#router.register(r'tasks', TaskViewSet, basename='tasks')
-#router.register(r'files', FileViewSet, basename= 'files')
+from django.urls import path
+from .views import RegisterView, ObtainTokenView, UserView
 
 urlpatterns = [
-    #path('', include(router.urls)),
-    path('', UserView.as_view(), name='user-viewSet'),
-    
-    ]
+    path('register/', RegisterView.as_view(), name='register'),  # for user registration
+    path('token/', ObtainTokenView.as_view(), name='token_obtain'),  # for obtaining JWT token
+    path('me/', UserView.as_view(), name='user-view'),  # for getting the user details
+]
