@@ -13,9 +13,12 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',  # rest_framework.permissions.IsAuthenticated', 
+        'rest_framework.permissions.AllowAny',
     ),
 }
+
+SOCIAL_AUTH_FACEBOOK_KEY = os.getenv('App_id')
+SOCIAL_AUTH_FACEBOOK_SECRET = os.getenv('App_secret')
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -30,20 +33,53 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    #Django Apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    
+    #Third-party apps
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
+    
+    #My Apps
     'Users',
     'todo_list',
     'todo_list.tasks',
-    'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',
-
-
+    
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+SITE_ID = 1 
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    'facebook': {
+        'APP': {
+            'client_id': os.getenv('App_id'),
+            'secret': os.getenv('App_secret'),
+            'key': ''
+        }
+    }
+}
+
+#Redirect URLS
+
+LOGIN_REDIRECT_URL= '/'
+LOGOUT_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -53,6 +89,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     'allauth.account.middleware.AccountMiddleware', 
 ]
 
 ROOT_URLCONF = 'backend.urls'

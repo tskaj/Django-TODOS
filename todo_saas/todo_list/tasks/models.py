@@ -18,7 +18,7 @@ class Task(models.Model):
 # File model
 class File(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='files')
-    file_path = models.CharField(max_length=255)
+    file_path = models.FileField(max_length=255)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

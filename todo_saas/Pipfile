@@ -13,6 +13,7 @@ decouple = "*"
 serializers = "*"
 python-dotenv = "*"
 djangorestframework-simplejwt = "*"
+django-allauth = "*"
 
 [dev-packages]
 
