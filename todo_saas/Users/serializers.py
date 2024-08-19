@@ -29,4 +29,9 @@ class UserSerializer(serializers.ModelSerializer):
    
 class TokenSerializer(serializers.Serializer):
     token = serializers.CharField(max_length=255)
-        
+
+class SetNewPasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_password(self, value):
+        return value

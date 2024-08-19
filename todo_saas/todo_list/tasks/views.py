@@ -82,10 +82,10 @@ class SimilarTaskView(APIView):
 
         tasks = Task.objects.filter(todo_list=todo_list)
 
-        # Find similar tasks
-        similar_tasks = []
+        # Dictionary to store tasks and their similar counterparts
+        similar_tasks_dict = {}
 
-        # Convert task descriptions to lowercase and split into words
+        # Iterate through each task to compare it with every other task
         for task in tasks:
             task_words = set(task.description.lower().split())
 
@@ -93,14 +93,23 @@ class SimilarTaskView(APIView):
                 if task.id != other_task.id:
                     other_task_words = set(other_task.description.lower().split())
 
-                    # Check if all words in task A exist in task B or vice versa
+                    # Check if task A's words are all in task B or vice versa
                     if task_words.issubset(other_task_words) or other_task_words.issubset(task_words):
-                        similar_tasks.append(task)
-                        break  # Stop checking once a similar task is found
+                        # Add the task to the dictionary with the task ID as key
+                        if task.id not in similar_tasks_dict:
+                            similar_tasks_dict[task.id] = task
+
+                        # Add the other task if not already added
+                        if other_task.id not in similar_tasks_dict:
+                            similar_tasks_dict[other_task.id] = other_task
+
+        # Convert the dictionary values to a list to get all similar tasks
+        similar_tasks = list(similar_tasks_dict.values())
 
         # Serialize the similar tasks and return the response
         serialized_tasks = self.serializer_class(similar_tasks, many=True).data
         return Response(data=serialized_tasks, status=200)
+
     
 
 class FileView(APIView):
