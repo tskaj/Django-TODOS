@@ -8,5 +8,4 @@ urlpatterns = [
     path('auth/facebook/', FacebookLoginView.as_view(), name='facebook_login'),  # Facebook login
     path('password/reset/', ResetPasswordView.as_view(), name='reset-password'),  # Reset password
     path('password/reset/confirm/', ConfirmResetPasswordView.as_view(), name='confirm-reset-password'),  # Confirm password reset
-    
 ]

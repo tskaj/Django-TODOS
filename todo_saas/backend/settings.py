@@ -15,6 +15,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
     ),
+    'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SOCIAL_AUTH_FACEBOOK_KEY = os.getenv('App_id')
@@ -55,6 +58,7 @@ INSTALLED_APPS = [
     'Users',
     'todo_list',
     'todo_list.tasks',
+    'drf_spectacular',
     
 ]
 
@@ -68,6 +72,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SITE_ID = 1
 
+# REST_FRAMEWORK = {
+# 'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
+# 'PAGE_SIZE': 10,
+# 'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+# }
 
 SOCIALACCOUNT_PROVIDERS = {
     'facebook': {
@@ -100,6 +109,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'], 
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -115,6 +125,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Todolist',
+    'DESCRIPTION': 'Todo List in Django',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 
 DATABASES = {

@@ -14,6 +14,7 @@ serializers = "*"
 python-dotenv = "*"
 djangorestframework-simplejwt = "*"
 django-allauth = "*"
+drf-spectacular = "*"
 
 [dev-packages]
 

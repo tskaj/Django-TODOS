@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
+from Users.response_mocks import FacebookMocks, ResetPasswordMocks
 from .serializers import UserRegisterationSerializer, UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
@@ -11,17 +12,28 @@ import requests
 from django.utils.encoding import force_bytes, smart_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import force_str
-from django.contrib.auth.tokens import default_token_generator
-from .serializers import SetNewPasswordSerializer
-
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 
 User = get_user_model()
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
-
+    serializer_class = UserRegisterationSerializer
+    @extend_schema(tags=["User APIs"])
+    @extend_schema(
+        request=UserRegisterationSerializer,
+        responses={
+            201: OpenApiResponse(
+                response=UserRegisterationSerializer,
+                description="User successfully registered"
+            ),
+            400: OpenApiResponse(
+                description="Invalid input"
+            ),
+        },
+        summary="Register a new user"
+    )
     def post(self, request):
         serializer = UserRegisterationSerializer(data=request.data)
         if serializer.is_valid():
@@ -36,7 +48,19 @@ class RegisterView(APIView):
     
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
-
+    @extend_schema(tags=["User APIs"])
+    @extend_schema(
+        request=ResetPasswordMocks.resetpassword_request_mock,
+        responses={
+            200: OpenApiResponse(
+                description="Password reset link sent"
+            ),
+            400: OpenApiResponse(
+                description="User with this email does not exist"
+            ),
+        },
+        summary="Send password reset link"
+    )
     def post(self, request):
         email = request.data.get('email')
         user = User.objects.filter(email=email).first()
@@ -45,18 +69,10 @@ class ResetPasswordView(APIView):
             token_generator = PasswordResetTokenGenerator()
             token = token_generator.make_token(user)
 
-            # Debugging information
-            print(f"User ID: {user.pk}")
-
-            # Encode user ID
             uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-            print(f"Encoded UID: {uidb64}")
 
-            # Create the reset link
             reset_link = f"http://localhost:8000/password/reset/confirm/?uid={uidb64}&token={token}"
-            print(f"Reset Link: {reset_link}")
 
-            # Send the reset link via email
             send_mail(
                 'Password Reset Request',
                 f'Please use the following link to reset your password: {reset_link}',
@@ -104,10 +120,19 @@ class ConfirmResetPasswordView(APIView):
             return Response({"error": "Invalid token or user ID"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class ObtainTokenView(APIView):
     permission_classes = [AllowAny]
+    @extend_schema(tags=["User APIs"])
+    @extend_schema(
+        request= FacebookMocks.facebook_request_mock,
+        responses={
+            200: FacebookMocks.facebook_response_mock,
+            400: OpenApiResponse(
+                description="Invalid facebook token"
+            ),
+        },
+        summary="Confirm password reset"
+    )
 
     def post(self, request):
         email = request.data.get('email')
@@ -126,7 +151,14 @@ class ObtainTokenView(APIView):
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
-
+    serializer_class = UserSerializer
+    @extend_schema(tags=["User APIs"])
+    @extend_schema(
+        responses={
+            200: UserSerializer,
+        },
+        summary="Get user details"
+    )
     def get(self, request):
         user = request.user
         serializer = UserSerializer(user)
@@ -134,6 +166,17 @@ class UserView(APIView):
     
     
 class FacebookLoginView(APIView):
+    @extend_schema(tags=["User APIs"])
+    @extend_schema(
+        request= FacebookMocks.facebook_request_mock,
+        responses={
+            200: FacebookMocks.facebook_response_mock,
+            400: OpenApiResponse(
+                description="Invalid facebook token"
+            ),
+        },
+        summary="Confirm password reset"
+    )
     def post(self, request):
         access_token = request.data.get("access_token")
 
