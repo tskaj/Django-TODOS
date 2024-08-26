@@ -1,7 +1,7 @@
 from pathlib import Path
 #from decouple import config
 import os
-
+import logging
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -142,8 +142,18 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST'), 
         'PORT': os.getenv('DB_PORT'), 
-    }
+    },
+    
+    'test': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('TEST_DB_NAME'),  # Test DB Name
+        'USER': os.getenv('TEST_DB_USER'),  # Postgres Test User
+        'PASSWORD': os.getenv('TEST_DB_PASSWORD'),
+        'HOST': os.getenv('TEST_DB_HOST'),
+        'PORT': os.getenv('TEST_DB_PORT'),
+    },
 }
+
 
 
 
@@ -187,3 +197,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+Logger = logging.getLogger("Todo-list"+__name__)
