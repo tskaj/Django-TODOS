@@ -67,7 +67,6 @@ class TodoListView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as err:
             Logger.error(f"Failed to create task {err}")
-            print(f"Failed to create task {err}")
 
     @extend_schema(tags=["TodoList APIs"])
     @extend_schema(
