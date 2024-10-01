@@ -15,6 +15,7 @@ python-dotenv = "*"
 djangorestframework-simplejwt = "*"
 django-allauth = "*"
 drf-spectacular = "*"
+coverage = "*"
 
 [dev-packages]
 

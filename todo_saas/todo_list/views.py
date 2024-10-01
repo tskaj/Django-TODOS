@@ -6,10 +6,13 @@ from .models import TodoList
 from .serializers import TodoListSerializer
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, OpenApiParameter
+from backend.settings import Logger
+
 
 class TodoListView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TodoListSerializer
+
     @extend_schema(tags=["TodoList APIs"])
     @extend_schema(
         summary='Retrieve a specific TodoList or the first one for the user',
@@ -34,6 +37,7 @@ class TodoListView(APIView):
 
         serializer = TodoListSerializer(todo_list)
         return Response(serializer.data, status=200)
+
     @extend_schema(tags=["TodoList APIs"])
     @extend_schema(
         summary='Create a new TodoList',
@@ -48,19 +52,22 @@ class TodoListView(APIView):
         ]
     )
     def post(self, request, todolist_id=None):
-        user = request.user
-        if todolist_id:
-            # Prevent creating a new todo list with an existing ID
-            return Response({"error": "Cannot create a todo list with an existing ID."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        data = request.data
-        data['user'] = user.id
-        serializer = TodoListSerializer(data=data)
+        try:
+            user = request.user
+            if todolist_id:
+                return Response({"error": "Cannot create a todo list with an existing ID."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            data = request.data.copy()  # Make a mutable copy of the data
+            data['user'] = user.id
+            serializer = TodoListSerializer(data=data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as err:
+            Logger.error(f"Failed to create task {err}")
+
     @extend_schema(tags=["TodoList APIs"])
     @extend_schema(
         summary='Update a specific TodoList',
@@ -84,6 +91,7 @@ class TodoListView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @extend_schema(tags=["TodoList APIs"])
     @extend_schema(
         summary='Delete a specific TodoList',

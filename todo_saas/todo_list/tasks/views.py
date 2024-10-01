@@ -162,6 +162,7 @@ class SimilarTaskView(APIView):
 class FileView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = FileSerializer
+
     @extend_schema(tags=["Task APIs"])
     @extend_schema(
         summary='Upload a file for a task',
@@ -179,33 +180,20 @@ class FileView(APIView):
     def post(self, request, task_id):
         task = get_object_or_404(Task, id=task_id, todo_list__user=request.user)
         
-        if not request.FILES:
-            return Response({"file": ["No file uploaded."]}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Include the task_id in the request data
-        request.data._mutable = True  # Make the request data mutable
-        request.data['task'] = task_id
+        if 'file_path' not in request.FILES:
+            return Response({"file_path": ["No file uploaded."]}, status=status.HTTP_400_BAD_REQUEST)
         
-        serializer = self.serializer_class(data=request.data)
+        file = request.FILES['file_path']
+
+        data = {
+            'file_path': file,
+            'task': task_id
+        }
+        
+        serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             serializer.save(task=task)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    @extend_schema(tags=["Task APIs"])
-    @extend_schema(
-        summary='Retrieve files for a task',
-        description='Fetches all files associated with the task specified by `task_id`.',
-        responses={
-            200: FileSerializer(many=True),
-            404: OpenApiResponse(description='Task not found')
-        },
-        parameters=[
-            OpenApiParameter(name='task_id', description='ID of the Task for which files are retrieved', required=True, type=int)
-        ]
-    )
-    def get(self, request, task_id):
-        task = get_object_or_404(Task, id=task_id, todo_list__user=request.user)
-        files = File.objects.filter(task=task)
-        serialized_files = self.serializer_class(files, many=True).data
-        return Response(data=serialized_files, status=status.HTTP_200_OK)
+

@@ -1,7 +1,7 @@
 from pathlib import Path
 #from decouple import config
 import os
-
+import logging
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -11,9 +11,10 @@ AUTH_USER_MODEL = 'Users.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
@@ -101,7 +102,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-     'allauth.account.middleware.AccountMiddleware', 
+    'allauth.account.middleware.AccountMiddleware', 
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -142,8 +143,18 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST'), 
         'PORT': os.getenv('DB_PORT'), 
-    }
+    },
+    
+    'test': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('TEST_DB_NAME'),  # Test DB Name
+        'USER': os.getenv('TEST_DB_USER'),  # Postgres Test User
+        'PASSWORD': os.getenv('TEST_DB_PASSWORD'),
+        'HOST': os.getenv('TEST_DB_HOST'),
+        'PORT': os.getenv('TEST_DB_PORT'),
+    },
 }
+
 
 
 
@@ -187,3 +198,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+Logger = logging.getLogger("Todo-list"+__name__)
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
